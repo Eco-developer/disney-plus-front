@@ -1,6 +1,4 @@
 import HeaderItems from '../header-items/index.js';
-import axios from 'axios';
-import DISNEY_API from '../../const/disneyApi.js';
 import {
   HeaderContainer,
   Logo,
@@ -51,16 +49,8 @@ const Header = (props) => {
   }
 
   const signOut = async () => {
-    try {
-      
-      await axios.get(
-        `${DISNEY_API}logout`,
-        { withCredentials: true }
-      )
-      dispatch(setSignOutState());
-    } catch (error){
-      console.log(error)
-    }
+    sessionStorage.removeItem("token")
+    dispatch(setSignOutState());
   }
 
   return (
