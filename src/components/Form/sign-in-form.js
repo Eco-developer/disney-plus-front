@@ -20,6 +20,7 @@ import {
 	SIGNUP_PAGE,
 	LANDING_PAGE
 } from '../../const/routes.js';
+import jwtDecode from 'jwt-decode';
 
 const SignInForm = () => {
 	const [email, setEmail] = useState('');
@@ -35,17 +36,19 @@ const SignInForm = () => {
 		if (disabled) { return; }
 		setProcessing(true);
 		const user = {
-			user_email: email.toLowerCase(),
-			user_password: password,
+			email: email.toLowerCase(),
+			password: password,
 		};
 		try {
 			const response = await axios.post(
 				`${DISNEY_API}login`,
-				{...user}, 
-				{withCredentials: true}
+				{...user}
 			)
-			const { data } = response;
-			dispatch(setUserLoginDetails(data));
+			if (response.data) {
+				const userData = jwtDecode(response.data);
+				sessionStorage.setItem("token", response.data);
+				dispatch(setUserLoginDetails(userData));
+			}
 		} catch (error) {
 			setProcessing(false);
 			setError(error.response?.data);		
