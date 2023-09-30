@@ -12,11 +12,7 @@ const userSlice = createSlice({
       state.userData = action.payload;
     },
     updateUserWatchlist: (state, action) => {
-      if (!state.userData.watchlist_items.map(item => item.id).includes(action.payload.id)) {
-        state.userData.watchlist_items.push(action.payload);
-      } else {
-        state.userData.watchlist_items = state.userData.watchlist_items.filter(item => item.id !== action.payload.id)
-      }
+      state.userData.watchlist_items = action.payload;
     },
     setSignOutState: (state) => {
       state.userData = null;
