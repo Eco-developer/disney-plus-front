@@ -24,6 +24,7 @@ import {
 	emailPattern, 
 	passwordPattern 
 } from '../../const/patterns.js';
+import jwtDecode from "jwt-decode";
 
 const SignUpForm = () => {
 	const { push } = useHistory();
@@ -61,16 +62,9 @@ const SignUpForm = () => {
 			)	
 
 			if (response.data) {
-				const responseLogin = await axios.post(
-				`${DISNEY_API}login`,
-					{
-						user_email: user.user_email, 
-						user_password: user.user_password
-					}, 
-					{withCredentials: true}
-				)
-				const { data } = responseLogin;
-				dispatch(setUserLoginDetails(data));
+				const userRegistered = jwtDecode(response.data);
+				sessionStorage.setItem("token", response.data);
+				dispatch(setUserLoginDetails(userRegistered));
 			}
 		} catch (error) {
 			setProcessing(false)
