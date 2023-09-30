@@ -11,6 +11,7 @@ import {
 	selectUser,
 	updateUserWatchlist
 } from '../../features/user/userSlice.js';
+import jwtDecode from 'jwt-decode';
 
 const Bookmark = ({movie}) => {
 	const user = useSelector(selectUser);
@@ -28,9 +29,12 @@ const Bookmark = ({movie}) => {
 				`${DISNEY_API}update/user/${user._id}`,
 				{ watchlist_item: {...movie} }, 
 			)
-			const { data } = response;
+			if (response.data) {
+				const userData = jwtDecode(response.data);
+				sessionStorage.setItem("token", response.data);
+				dispatch(updateUserWatchlist(userData.watchlist_items));
+			}
 			setProcessing(false);
-			dispatch(updateUserWatchlist(data));
 		} catch (error) {
 			setProcessing(false);
 		}
