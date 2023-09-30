@@ -1,8 +1,6 @@
 import Navigation from './domain/Navigation/index.js'
 import Loading from './components/Loading/index.js';
 import NotFound from './components/not-found/index.js';
-import axios from 'axios';
-import DISNEY_API from './const/disneyApi.js';
 import TMDBInstace from './services/axios.js';
 import TMDBRequests from './services/request.js';
 import { setUserLoginDetails } from './features/user/userSlice.js';
@@ -22,6 +20,7 @@ import {
 } from 'react';
 import "./App.css";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+import jwtDecode from 'jwt-decode';
 
 function App() {
 	const dispatch = useDispatch();
@@ -31,16 +30,9 @@ function App() {
 	useEffect(() => {
 		const fetchInitialData = async () => {
 			try {
-				const userResponse = await axios.get(
-					`${DISNEY_API}auth-user`,
-					{ withCredentials: true }
-				)
 				const movieResponse = await TMDBInstace.get(TMDBRequests.movie.genres);
 				const seriesResponse = await TMDBInstace.get(TMDBRequests.series.genres);
 
-				const { 
-					data : userData 
-				} = userResponse;
 				const { 
 					data : {
 						genres : movieGenres
@@ -54,11 +46,11 @@ function App() {
 
 				dispatch(setMovieGenres(movieGenres));
 				dispatch(setSeriesGenres(seriesGenres));
-				if (!userData) {
-					setLoading(false);
-					return;
+				const token = sessionStorage.getItem("token")
+				if (token) {
+					const userData = jwtDecode(token);
+					dispatch(setUserLoginDetails(userData));
 				}
-				dispatch(setUserLoginDetails(userData));
 				setLoading(false);
 			} catch (err) {
 				dispatch(setError());
